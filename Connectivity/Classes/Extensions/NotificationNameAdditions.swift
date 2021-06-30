@@ -8,6 +8,6 @@
 import Foundation
 
 extension Notification.Name {
-    public static let ReachabilityDidChange = Notification.Name("kNetworkReachabilityChangedNotification")
+    public static let ReachabilityDidChange = Notification.Name("kABSNetworkReachabilityChangedNotification")
     public static let ConnectivityDidChange = Notification.Name("kNetworkConnectivityChangedNotification")
 }
