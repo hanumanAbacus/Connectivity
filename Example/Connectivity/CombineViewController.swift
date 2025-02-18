@@ -39,9 +39,12 @@ extension CombineViewController {
 private extension CombineViewController {
     func startConnectivityChecks() {
         activityIndicator.startAnimating()
-        let publisher = Connectivity.Publisher()
+        let publisher = Connectivity.Publisher(
+            configuration:
+            .init()
+                .configureURLSession(.default)
+        ).eraseToAnyPublisher()
         cancellable = publisher.receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
             .sink(receiveCompletion: { [weak self] _ in
                 guard let strongSelf = self else {
                     return
@@ -51,7 +54,7 @@ private extension CombineViewController {
                 strongSelf.updateNotifierButton(isCheckingConnectivity: strongSelf.isCheckingConnectivity)
             }, receiveValue: { [weak self] connectivity in
                 self?.updateConnectionStatus(connectivity.status)
-        })
+            })
         isCheckingConnectivity = true
         updateNotifierButton(isCheckingConnectivity: isCheckingConnectivity)
     }
