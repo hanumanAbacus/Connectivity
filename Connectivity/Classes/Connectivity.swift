@@ -289,6 +289,7 @@ public extension Connectivity {
     /// Stop listening for Reachability changes
     func stopNotifier() {
         timer?.invalidate()
+        urlSession.finishTasksAndInvalidate()
         // swiftlint:disable:next notification_center_detachment
         NotificationCenter.default.removeObserver(self)
         if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
@@ -369,7 +370,11 @@ private extension Connectivity {
         let totalChecks = UInt(connectivityURLRequests.count)
         
         // Ensure that we are using the latest session configuration.
+        // URLSession retains its delegate until invalidated; finish any in-flight
+        // tasks on the previous session before replacing it to avoid leaks.
+        let expiredSession = urlSession
         urlSession = defaultURLSession()
+        expiredSession.finishTasksAndInvalidate()
         
         // Connectivity check callback
         let completionHandlerForURLRequest: (URLRequest) -> ((Data?, URLResponse?, Error?) -> Void) = { urlRequest in
